@@ -16,15 +16,27 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: id
+        - AttributeName: title
           AttributeType: S
+        - AttributeName: url
+          AttributeType: S
+        - AttributeName: tag
+          AttributeType: S
+        - AttributeName: is_book
+          AttributeType: N
+        - AttributeName: is_ebook
+          AttributeType: N
+        - AttributeName: timestamp
+          AttributeType: N
       KeySchema:
-        - AttributeName: id
+        - AttributeName: title
           KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: dynamodbtest
+      TableName: book-clipper
   # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
   DynamoAccessFunctionRole:
     Type: AWS::IAM::Role
@@ -47,11 +59,11 @@ Resources:
                 Action:
                   - logs:*
                   - dynamodb:*
-  HelloWorldFunction:
+  BooksPostFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello-world/
-      Handler: hello-world
+      CodeUri: books-post/
+      Handler: books-post
       Role: !GetAtt DynamoAccessFunctionRole.Arn
       Runtime: go1.x
       Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
@@ -59,8 +71,8 @@ Resources:
         CatchAll:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
-            Method: GET
+            Path: /books
+            Method: post
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           PARAM1: VALUE
@@ -69,12 +81,12 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldAPI:
+  BooksPostAPI:
     Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/"
+  BooksPostFunction:
     Description: "First Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
+    Value: !GetAtt BooksPostFunction.Arn
+  BooksPostFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    Value: !GetAtt BooksPostFunctionRole.Arn
