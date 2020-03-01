@@ -20,6 +20,7 @@ import (
 
 // DynamoDB/Book用Struct定義
 type Book struct {
+	Id        string    `dynamo:"id" json:"id"`
 	Title     string    `dynamo:"title" json:"title"`
 	Url       string    `dynamo:"url" json:"url"`
 	Tag       []string  `dynamo:"tag,set" json:"tag"`

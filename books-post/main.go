@@ -1,9 +1,12 @@
 package main
 
+// https://github.com/google/uuid
 // https://github.com/guregu/dynamo
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -24,6 +27,7 @@ type Request struct {
 
 // DynamoDB/Book用Struct定義
 type Book struct {
+	Id        string    `dynamo:"id" json:"id"`
 	Title     string    `dynamo:"title" json:"title"`
 	Url       string    `dynamo:"url" json:"url"`
 	Tag       []string  `dynamo:"tag,set" json:"tag"`
@@ -43,8 +47,15 @@ var (
 )
 
 func Handler(request Request) (events.APIGatewayProxyResponse, error) {
+	// uuid作成
+	u, err := uuid.NewRandom()
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// 登録用structオブジェクト作成
 	b := Book{
+		Id:        u.String(),
 		Title:     request.Title,
 		Url:       request.Url,
 		Tag:       request.Tag,
