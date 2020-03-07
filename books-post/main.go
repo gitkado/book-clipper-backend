@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
@@ -16,8 +14,7 @@ import (
 	"github.com/guregu/dynamo"
 )
 
-// RequestBody用Struct定義
-type Request struct {
+type RequestBook struct {
 	Title   string   `json:"title"`
 	Url     string   `json:"url"`
 	Tag     []string `json:"tag"`
@@ -25,15 +22,20 @@ type Request struct {
 	IsEbook bool     `json:"is_ebook"`
 }
 
+// RequestBody用Struct定義
+type Request struct {
+	Book RequestBook `json:"book"`
+}
+
 // DynamoDB/Book用Struct定義
 type Book struct {
-	Id        string    `dynamo:"id" json:"id"`
 	Title     string    `dynamo:"title" json:"title"`
 	Url       string    `dynamo:"url" json:"url"`
 	Tag       []string  `dynamo:"tag,set" json:"tag"`
 	IsBook    bool      `dynamo:"is_book" json:"is_book"`
 	IsEbook   bool      `dynamo:"is_ebook" json:"is_ebook"`
-	Timestamp time.Time `dynamo:"timestamp" json:"timestamp"`
+	CreatedAt time.Time `dynamo:"created_at" json:"created_at"`
+	UpdatedAt time.Time `dynamo:"updated_at" json:"updated_at"`
 }
 
 // 変数定義
@@ -47,21 +49,16 @@ var (
 )
 
 func Handler(request Request) (events.APIGatewayProxyResponse, error) {
-	// uuid作成
-	u, err := uuid.NewRandom()
-	if err != nil {
-		panic(err.Error())
-	}
-
 	// 登録用structオブジェクト作成
+	time_now := time.Now().UTC()
 	b := Book{
-		Id:        u.String(),
-		Title:     request.Title,
-		Url:       request.Url,
-		Tag:       request.Tag,
-		IsBook:    request.IsBook,
-		IsEbook:   request.IsEbook,
-		Timestamp: time.Now().UTC(),
+		Title:     request.Book.Title,
+		Url:       request.Book.Url,
+		Tag:       request.Book.Tag,
+		IsBook:    request.Book.IsBook,
+		IsEbook:   request.Book.IsEbook,
+		CreatedAt: time_now,
+		UpdatedAt: time_now,
 	}
 	// jsonレスポンス用に変換
 	b_byte, _ := json.Marshal(b)

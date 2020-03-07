@@ -20,13 +20,13 @@ import (
 
 // DynamoDB/Book用Struct定義
 type Book struct {
-	Id        string    `dynamo:"id" json:"id"`
 	Title     string    `dynamo:"title" json:"title"`
 	Url       string    `dynamo:"url" json:"url"`
 	Tag       []string  `dynamo:"tag,set" json:"tag"`
 	IsBook    bool      `dynamo:"is_book" json:"is_book"`
 	IsEbook   bool      `dynamo:"is_ebook" json:"is_ebook"`
-	Timestamp time.Time `dynamo:"timestamp" json:"timestamp"`
+	CreatedAt time.Time `dynamo:"created_at" json:"created_at"`
+	UpdatedAt time.Time `dynamo:"updated_at" json:"updated_at"`
 }
 
 // 変数定義

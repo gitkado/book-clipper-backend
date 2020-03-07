@@ -18,8 +18,6 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
         - AttributeName: title
           AttributeType: S
         - AttributeName: url
@@ -30,15 +28,13 @@ Resources:
           AttributeType: N
         - AttributeName: is_ebook
           AttributeType: N
-        - AttributeName: timestamp
+        - AttributeName: created_at
+          AttributeType: N
+        - AttributeName: updated_at
           AttributeType: N
       KeySchema:
-        - AttributeName: id
+        - AttributeName: created_at
           KeyType: HASH
-        # - AttributeName: title
-        #   KeyType: HASH
-        # - AttributeName: timestamp
-        #   KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -102,8 +98,20 @@ Resources:
         CatchAll:
           Type: Api
           Properties:
-            Path: /books/{id}
+            Path: /books/{created_at}
             Method: get
+  BooksIdPutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: books-id-put/
+      Handler: books-id-put
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: put
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -123,7 +131,13 @@ Outputs:
     Value: !GetAtt BooksGetFunction.Arn
   BooksIdGetAPI:
     Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:title/:timestamp"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:id"
   BooksIdGetFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt BooksIdGetFunction.Arn
+  BooksIdPutAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:id"
+  BooksIdPutFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksIdPutFunction.Arn
