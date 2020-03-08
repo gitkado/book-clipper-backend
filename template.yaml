@@ -112,6 +112,18 @@ Resources:
           Properties:
             Path: /books/{created_at}
             Method: put
+  BooksIdDeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: books-id-delete/
+      Handler: books-id-delete
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: delete
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -131,13 +143,19 @@ Outputs:
     Value: !GetAtt BooksGetFunction.Arn
   BooksIdGetAPI:
     Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:id"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at"
   BooksIdGetFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt BooksIdGetFunction.Arn
   BooksIdPutAPI:
     Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:id"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at"
   BooksIdPutFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt BooksIdPutFunction.Arn
+  BooksIdDeleteAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at"
+  BooksIdDeleteFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksIdDeleteFunction.Arn
