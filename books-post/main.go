@@ -14,19 +14,6 @@ import (
 	"github.com/guregu/dynamo"
 )
 
-type RequestBook struct {
-	Title   string   `json:"title"`
-	Url     string   `json:"url"`
-	Tag     []string `json:"tag"`
-	IsBook  bool     `json:"is_book"`
-	IsEbook bool     `json:"is_ebook"`
-}
-
-// RequestBody用Struct定義
-type Request struct {
-	Book RequestBook `json:"book"`
-}
-
 // DynamoDB/Book用Struct定義
 type Book struct {
 	Title     string    `dynamo:"title" json:"title"`
@@ -36,6 +23,11 @@ type Book struct {
 	IsEbook   bool      `dynamo:"is_ebook" json:"is_ebook"`
 	CreatedAt time.Time `dynamo:"created_at" json:"created_at"`
 	UpdatedAt time.Time `dynamo:"updated_at" json:"updated_at"`
+}
+
+// RequestBody用Struct定義
+type Request struct {
+	Book Book `json:"book"`
 }
 
 // 変数定義

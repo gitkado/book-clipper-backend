@@ -13,11 +13,6 @@ import (
 	"github.com/guregu/dynamo"
 )
 
-// RequestBody用Struct定義
-// 検索やソート機能を実装する場合に使用
-// type Request struct {
-// }
-
 // DynamoDB/Book用Struct定義
 type Book struct {
 	Title     string    `dynamo:"title" json:"title"`
@@ -28,6 +23,11 @@ type Book struct {
 	CreatedAt time.Time `dynamo:"created_at" json:"created_at"`
 	UpdatedAt time.Time `dynamo:"updated_at" json:"updated_at"`
 }
+
+// RequestBody用Struct定義
+// 検索やソート機能を実装する場合に使用
+// type Request struct {
+// }
 
 // 変数定義
 var (

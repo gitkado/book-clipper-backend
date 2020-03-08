@@ -13,11 +13,8 @@ import (
 	"github.com/guregu/dynamo"
 )
 
-type RequestOld struct {
-	CreatedAt string `json:"created_at"`
-}
-
-type RequestBook struct {
+// DynamoDB/Book用Struct定義
+type Book struct {
 	Title     string    `dynamo:"title" json:"title"`
 	Url       string    `dynamo:"url" json:"url"`
 	Tag       []string  `dynamo:"tag,set" json:"tag"`
@@ -27,10 +24,14 @@ type RequestBook struct {
 	UpdatedAt time.Time `dynamo:"updated_at" json:"updated_at"`
 }
 
+type RequestOld struct {
+	CreatedAt string `json:"created_at"`
+}
+
 // RequestBody用Struct定義
 type Request struct {
-	Old  RequestOld  `json:"old"`
-	Book RequestBook `json:"book"`
+	Book Book       `json:"book"`
+	Old  RequestOld `json:"old"`
 }
 
 // 変数定義
