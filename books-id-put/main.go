@@ -44,24 +44,35 @@ var (
 	table = db.Table("book-clipper")
 )
 
-func Handler(request Request) (events.APIGatewayProxyResponse, error) {
-	// jsonレスポンス用に変換
-	b_byte, _ := json.Marshal(request.Book)
+func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// JSONリクエストからstructオブジェクト作成
+	r := new(Request)
+	err := json.Unmarshal([]byte(request.Body), r)
+	if err != nil {
+		panic(err.Error())
+	}
 
-	// dynamoからget
-	created_at := request.Old.CreatedAt
+	// 登録用structオブジェクト準備
+	time_now := time.Now().UTC()
+	r.Book.UpdatedAt = time_now
+
+	// jsonレスポンス用に変換
+	b_byte, _ := json.Marshal(r.Book)
+
+	// dynamo検索用
+	created_at := r.Book.CreatedAt
 
 	// dynamoにupdate
 	u := table.Update("created_at", created_at)
-	u.Set("title", request.Book.Title)
-	u.Set("url", request.Book.Url)
-	u.SetSet("tag", request.Book.Tag)
-	u.Set("is_book", request.Book.IsBook)
-	u.Set("is_ebook", request.Book.IsEbook)
-	u.Set("updated_at", time.Now().UTC())
+	u.Set("title", r.Book.Title)
+	u.Set("url", r.Book.Url)
+	u.SetSet("tag", r.Book.Tag)
+	u.Set("is_book", r.Book.IsBook)
+	u.Set("is_ebook", r.Book.IsEbook)
+	u.Set("updated_at", r.Book.UpdatedAt)
 
 	// dynamoにput
-	err := u.Run()
+	err = u.Run()
 	if err != nil {
 		panic(err.Error())
 	}
