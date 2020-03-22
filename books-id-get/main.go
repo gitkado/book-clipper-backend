@@ -24,11 +24,6 @@ type Book struct {
 	UpdatedAt time.Time `dynamo:"updated_at" json:"updated_at"`
 }
 
-// RequestBody用Struct定義
-type Request struct {
-	CreatedAt string `dynamo:"created_at" json:"created_at"`
-}
-
 // 変数定義
 var (
 	// dynamoオブジェクト作成
@@ -39,12 +34,12 @@ var (
 	table = db.Table("book-clipper")
 )
 
-func Handler(request Request) (events.APIGatewayProxyResponse, error) {
+func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// データ格納用structオブジェクト作成
 	var result Book
 
 	// dynamoからget
-	created_at := request.CreatedAt
+	created_at := request.PathParameters["created_at"]
 
 	if err := table.Get("created_at", created_at).One(&result); err != nil {
 		panic(err.Error())

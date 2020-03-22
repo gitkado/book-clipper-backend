@@ -23,6 +23,9 @@ sam local invoke BooksGetFunction --no-event
 sam local invoke BooksIdGetFunction --event events/books-id-get.json
 sam local invoke BooksIdPutFunction --event events/books-id-put.json
 sam local invoke BooksIdDeleteFunction --event events/books-id-delete.json
+
+sam local start-api
+curl 127.0.0.1:3000
 ```
 
 ## URL
