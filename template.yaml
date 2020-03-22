@@ -10,28 +10,28 @@ Globals:
   Function:
     Runtime: go1.x
     Timeout: 5
-    Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+    # Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 
 Resources:
   # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
-  AccessDynamoDB:
+  DynamoDB:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: title
-          AttributeType: S
-        - AttributeName: url
-          AttributeType: S
-        - AttributeName: tag
-          AttributeType: S
-        - AttributeName: is_book
-          AttributeType: N
-        - AttributeName: is_ebook
-          AttributeType: N
+        # - AttributeName: title
+        #   AttributeType: S
+        # - AttributeName: url
+        #   AttributeType: S
+        # - AttributeName: tag
+        #   AttributeType: S
+        # - AttributeName: is_book
+        #   AttributeType: N
+        # - AttributeName: is_ebook
+        #   AttributeType: N
         - AttributeName: created_at
-          AttributeType: N
-        - AttributeName: updated_at
-          AttributeType: N
+          AttributeType: S
+        # - AttributeName: updated_at
+        #   AttributeType: S
       KeySchema:
         - AttributeName: created_at
           KeyType: HASH

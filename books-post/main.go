@@ -40,15 +40,22 @@ var (
 	table = db.Table("book-clipper")
 )
 
-func Handler(request Request) (events.APIGatewayProxyResponse, error) {
+func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// JSONリクエストからstructオブジェクト作成
+	r := new(Request)
+	err := json.Unmarshal([]byte(request.Body), r)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// 登録用structオブジェクト作成
 	time_now := time.Now().UTC()
 	b := Book{
-		Title:     request.Book.Title,
-		Url:       request.Book.Url,
-		Tag:       request.Book.Tag,
-		IsBook:    request.Book.IsBook,
-		IsEbook:   request.Book.IsEbook,
+		Title:     r.Book.Title,
+		Url:       r.Book.Url,
+		Tag:       r.Book.Tag,
+		IsBook:    r.Book.IsBook,
+		IsEbook:   r.Book.IsEbook,
 		CreatedAt: time_now,
 		UpdatedAt: time_now,
 	}
