@@ -27,15 +27,15 @@ var (
 	table = db.Table("book-clipper")
 )
 
-func Handler(request Request) (events.APIGatewayProxyResponse, error) {
+func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// dynamoからdelete
-	created_at := request.CreatedAt
+	created_at := request.PathParameters["created_at"]
 	if err := table.Delete("created_at", created_at).Run(); err != nil {
 		panic(err.Error())
 	}
 
 	// jsonレスポンス用に変換
-	b_byte, _ := json.Marshal(request)
+	b_byte, _ := json.Marshal(request.PathParameters)
 
 	// lambdaレスポンス返却
 	return events.APIGatewayProxyResponse{
