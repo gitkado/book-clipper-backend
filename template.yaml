@@ -10,7 +10,6 @@ Globals:
   Function:
     Runtime: go1.x
     Timeout: 5
-    # Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
 
 Resources:
   # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
@@ -18,20 +17,8 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        # - AttributeName: title
-        #   AttributeType: S
-        # - AttributeName: url
-        #   AttributeType: S
-        # - AttributeName: tag
-        #   AttributeType: S
-        # - AttributeName: is_book
-        #   AttributeType: N
-        # - AttributeName: is_ebook
-        #   AttributeType: N
         - AttributeName: created_at
           AttributeType: S
-        # - AttributeName: updated_at
-        #   AttributeType: S
       KeySchema:
         - AttributeName: created_at
           KeyType: HASH
@@ -73,9 +60,6 @@ Resources:
           Properties:
             Path: /books
             Method: post
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
   BooksGetFunction:
     Type: AWS::Serverless::Function
     Properties:

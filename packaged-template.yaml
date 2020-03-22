@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'book-clipper-backend
+
+  Sample SAM Template for book-clipper-backend
+
+  '
+Globals:
+  Function:
+    Runtime: go1.x
+    Timeout: 5
+Resources:
+  DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: created_at
+        AttributeType: S
+      KeySchema:
+      - AttributeName: created_at
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: book-clipper
+  DynamoAccessFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Resource: '*'
+            Effect: Allow
+            Action:
+            - logs:*
+            - dynamodb:*
+  BooksPostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://s3-sam-sample-gitkado/8d5cec6437c128025899113879f4f399
+      Handler: books-post
+      Role:
+        Fn::GetAtt:
+        - DynamoAccessFunctionRole
+        - Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: post
+  BooksGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://s3-sam-sample-gitkado/811df9ffe8cd24a047664a346e5a6380
+      Handler: books-get
+      Role:
+        Fn::GetAtt:
+        - DynamoAccessFunctionRole
+        - Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: get
+  BooksIdGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://s3-sam-sample-gitkado/d79636bcb332485889a9584bf63d746b
+      Handler: books-id-get
+      Role:
+        Fn::GetAtt:
+        - DynamoAccessFunctionRole
+        - Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: get
+  BooksIdPutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://s3-sam-sample-gitkado/4f2ed1889f02430c18c115f1c41058d5
+      Handler: books-id-put
+      Role:
+        Fn::GetAtt:
+        - DynamoAccessFunctionRole
+        - Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: put
+  BooksIdDeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://s3-sam-sample-gitkado/3f681a7c2f8b4c60b567306431df42f5
+      Handler: books-id-delete
+      Role:
+        Fn::GetAtt:
+        - DynamoAccessFunctionRole
+        - Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: delete
+Outputs:
+  BooksPostAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/
+  BooksPostFunction:
+    Description: First Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - BooksPostFunction
+      - Arn
+  BooksGetAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/
+  BooksGetFunction:
+    Description: First Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - BooksGetFunction
+      - Arn
+  BooksIdGetAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at
+  BooksIdGetFunction:
+    Description: First Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - BooksIdGetFunction
+      - Arn
+  BooksIdPutAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at
+  BooksIdPutFunction:
+    Description: First Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - BooksIdPutFunction
+      - Arn
+  BooksIdDeleteAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at
+  BooksIdDeleteFunction:
+    Description: First Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - BooksIdDeleteFunction
+      - Arn
