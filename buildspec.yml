@@ -1,0 +1,21 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+      python: 3.8
+      golang: 1.13
+    commands:
+      - pip install --user --upgrade aws-sam-cli
+  build:
+    commands:
+      - GOOS=linux GOARCH=amd64 go build -o books-post/books-post ./books-post
+      - GOOS=linux GOARCH=amd64 go build -o books-get/books-get ./books-get
+      - GOOS=linux GOARCH=amd64 go build -o books-id-get/books-id-get ./books-id-get
+      - GOOS=linux GOARCH=amd64 go build -o books-id-put/books-id-put ./books-id-put
+      - GOOS=linux GOARCH=amd64 go build -o books-id-delete/books-id-delete ./books-id-delete
+      - sam package --template-file template.yaml --s3-bucket $OUTPUT_BUCKET_NAME --output-template-file packaged-template.yaml --region ap-northeast-1
+artifacts:
+  type: zip
+  files:
+    - packaged-template.yaml

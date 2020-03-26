@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  book-clipper-backend
+  
+  Sample SAM Template for book-clipper-backend
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Runtime: go1.x
+    Timeout: 5
+
+Resources:
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+  DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: created_at
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: book-clipper
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  DynamoAccessFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - logs:*
+                  - dynamodb:*
+  BooksPostFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: books-post/
+      Handler: books-post
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /books
+            Method: post
+  BooksGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: books-get/
+      Handler: books-get
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: get
+  BooksIdGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: books-id-get/
+      Handler: books-id-get
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: get
+  BooksIdPutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: books-id-put/
+      Handler: books-id-put
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: put
+  BooksIdDeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: books-id-delete/
+      Handler: books-id-delete
+      Role: !GetAtt DynamoAccessFunctionRole.Arn
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /books/{created_at}
+            Method: delete
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  BooksPostAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/"
+  BooksPostFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksPostFunction.Arn
+  BooksGetAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/"
+  BooksGetFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksGetFunction.Arn
+  BooksIdGetAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at"
+  BooksIdGetFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksIdGetFunction.Arn
+  BooksIdPutAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at"
+  BooksIdPutFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksIdPutFunction.Arn
+  BooksIdDeleteAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/books/:created_at"
+  BooksIdDeleteFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt BooksIdDeleteFunction.Arn
